@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>PakTourIntel | Premium Tourism Platform</title>
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0-beta3/css/all.min.css"/>
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+
+    <!-- ===== SEPARATE CSS FILE ===== -->
+    <link rel="stylesheet" href="style.css"/>
+</head>
+<body>
+
+    <!-- ===== NAVBAR ===== -->
+    <nav class="navbar" id="navbar">
+        <div class="logo"><i class="fas fa-chart-line"></i> PakTourIntel</div>
+        <button class="menu-icon" id="menuIcon" aria-label="Toggle menu">
+            <i class="fas fa-bars"></i>
+        </button>
+        <ul class="nav-links" id="navLinks">
+            <li><a class="nav-link active" data-page="home"><i class="fas fa-home"></i> Home</a></li>
+            <li><a class="nav-link" data-page="planner"><i class="fas fa-map-marked-alt"></i> Trip Planner</a></li>
+            <li><a class="nav-link" data-page="my-trips"><i class="fas fa-suitcase"></i> My Trips</a></li>
+            <li><a class="nav-link" data-page="seasonal"><i class="fas fa-calendar-alt"></i> Seasonal</a></li>
+            <li><a class="nav-link" data-page="dashboard"><i class="fas fa-chart-pie"></i> Analytics</a></li>
+            <li><a class="nav-link" data-page="contact"><i class="fas fa-envelope"></i> Contact</a></li>
+            <li>
+                <div class="auth-buttons" id="authButtons">
+                    <button class="btn-auth login" id="loginBtn"><i class="fas fa-sign-in-alt"></i> Login</button>
+                    <button class="btn-auth register" id="registerBtn"><i class="fas fa-user-plus"></i> Register</button>
+                </div>
+            </li>
+        </ul>
+    </nav>
+
+    <div class="mobile-overlay" id="mobileOverlay"></div>
+
+    <!-- ===== AUTH MODAL ===== -->
+    <div class="auth-overlay" id="authOverlay">
+        <div class="auth-container">
+            <button class="close-auth" id="closeAuth"><i class="fas fa-times"></i></button>
+            <h2 id="authTitle">Login</h2>
+            <p class="auth-sub" id="authSub">Welcome back! Login to your account</p>
+            <form id="authForm">
+                <div class="form-group">
+                    <label><i class="fas fa-envelope"></i> Email</label>
+                    <input type="email" id="authEmail" placeholder="Enter your email" required/>
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-lock"></i> Password</label>
+                    <input type="password" id="authPassword" placeholder="Enter your password" required/>
+                </div>
+                <div class="form-group" id="authNameGroup" style="display:none;">
+                    <label><i class="fas fa-user"></i> Full Name</label>
+                    <input type="text" id="authName" placeholder="Enter your full name"/>
+                </div>
+                <button type="submit" class="btn-auth-submit" id="authSubmitBtn"><i class="fas fa-sign-in-alt"></i> Login</button>
+            </form>
+            <div class="auth-switch">
+                <span id="authSwitchText">Don't have an account?</span>
+                <a id="authSwitchLink">Register</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== TRIP FORM OVERLAY ===== -->
+    <div class="trip-form-overlay" id="tripFormOverlay">
+        <div class="trip-form-container">
+            <button class="close-form" id="closeTripForm"><i class="fas fa-times"></i></button>
+            <h2><i class="fas fa-map-marked-alt" style="color:var(--secondary);"></i> Plan Your Trip</h2>
+            <p class="sub">Fill in the details below to plan your perfect journey</p>
+            <form id="tripPlanForm">
+                <div class="form-group">
+                    <label><i class="fas fa-map-pin"></i> Destination</label>
+                    <select id="tripDestination" required>
+                        <option value="">Select a destination...</option>
+                        <option value="Hunza Valley">Hunza Valley</option>
+                        <option value="Skardu">Skardu</option>
+                        <option value="Swat Valley">Swat Valley</option>
+                        <option value="Naran Kaghan">Naran Kaghan</option>
+                        <option value="Fairy Meadows">Fairy Meadows</option>
+                        <option value="Murree">Murree</option>
+                        <option value="Lahore">Lahore</option>
+                        <option value="Islamabad">Islamabad</option>
+                        <option value="Neelum Valley">Neelum Valley</option>
+                        <option value="Chitral">Chitral</option>
+                        <option value="Gwadar">Gwadar</option>
+                        <option value="Karachi">Karachi</option>
+                    </select>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label><i class="fas fa-calendar-day"></i> Start Date</label>
+                        <input type="date" id="tripStartDate" required/>
+                    </div>
+                    <div class="form-group">
+                        <label><i class="fas fa-calendar-day"></i> End Date</label>
+                        <input type="date" id="tripEndDate" required/>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-users"></i> Number of Travelers</label>
+                    <input type="number" id="tripTravelers" min="1" value="1" required/>
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-dollar-sign"></i> Budget (USD)</label>
+                    <input type="number" id="tripBudget" min="50" value="500" required/>
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-sticky-note"></i> Notes / Special Requests</label>
+                    <textarea id="tripNotes" placeholder="Any special requests or notes..."></textarea>
+                </div>
+                <button type="submit" class="btn-submit"><i class="fas fa-calendar-check"></i> Plan My Trip</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- ===== MAIN CONTENT ===== -->
+    <main id="app-root"></main>
+
+    <!-- ===== FOOTER ===== -->
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-section">
+                <h3><i class="fas fa-chart-line"></i> PakTourIntel</h3>
+                <p style="margin-top:6px;font-size:0.85rem;">Official PTDC Tourism Intelligence Platform providing data-driven insights for Pakistan's tourism sector.</p>
+                <div class="social-links">
+                    <a href="#"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#"><i class="fab fa-instagram"></i></a>
+                    <a href="#"><i class="fab fa-linkedin-in"></i></a>
+                    <a href="#"><i class="fab fa-twitter"></i></a>
+                </div>
+                <div style="margin-top:0.8rem;">
+                    <span class="db-status" id="dbStatus"><i class="fas fa-circle"></i> Database: Loading...</span>
+                </div>
+            </div>
+            <div class="footer-section">
+                <h3>Quick Links</h3>
+                <a href="#" data-page="home"><i class="fas fa-home"></i> Home</a>
+                <a href="#" data-page="planner"><i class="fas fa-map-marked-alt"></i> Trip Planner</a>
+                <a href="#" data-page="my-trips"><i class="fas fa-suitcase"></i> My Trips</a>
+                <a href="#" data-page="seasonal"><i class="fas fa-calendar-alt"></i> Seasonal Guide</a>
+                <a href="#" data-page="dashboard"><i class="fas fa-chart-pie"></i> Analytics</a>
+            </div>
+            <div class="footer-section">
+                <h3>Contact</h3>
+                <p><i class="fas fa-map-marker-alt"></i> Hostel City, Islamabad</p>
+                <p><i class="fas fa-phone"></i> +92 326 9147767</p>
+                <p><i class="fas fa-envelope"></i> info@ptdc.gov.pk</p>
+            </div>
+            <div class="footer-section">
+                <h3>Resources</h3>
+                <a href="#"><i class="fas fa-database"></i> Tourism Statistics</a>
+                <a href="#"><i class="fas fa-shield-alt"></i> Travel Guidelines</a>
+                <a href="#"><i class="fas fa-file-pdf"></i> PTDC Annual Report</a>
+                <a href="#"><i class="fas fa-lock"></i> Privacy Policy</a>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p><i class="far fa-copyright"></i> 2025 Pakistan Tourism Development Corporation</p>
+        </div>
+    </footer>
+
+    <!-- ===== SEPARATE JAVASCRIPT FILE ===== -->
+    <script src="app.js"></script>
+</body>
+</html>
